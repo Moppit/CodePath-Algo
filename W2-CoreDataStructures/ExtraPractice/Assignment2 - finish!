@@ -1,0 +1,48 @@
+import ast
+import fileinput
+from heapq import *
+
+numBuildings = -1
+buildings = []
+for line in fileinput.input():
+    if numBuildings < 0:
+        numBuildings = int(line)
+    else:
+        building = [int(num) for num in line.split(' ')]
+        buildings.append(building) 
+
+def getSkyline(buildings):
+    """
+    :type buildings: List[List[int]]
+    :rtype: List[List[int]]
+    """
+    # Sort buildings by height
+    buildings.sort(key = lambda x: x[2], reverse=True)
+    # Parse the buildings into a list to find items based on index
+    parsed = {}
+    for i in range(len(buildings)):
+        if len(parsed) == 0:
+            parsed[i] = []
+            parsed[i].append(['L', buildings[i][0]])
+            parsed[i].append(['R', buildings[i][1]])
+        # Otherwise iterate through buildings up to given index
+        addLeft = True
+        addRight = True
+        for j in range(i):
+            # Add left -- need to do this after checking ALL items, not after every time
+            if buildings[j][0] < buildings[i][0] and buildings[j][1] > buildings[i][0]:
+                addLeft = False
+            # Add right
+            if buildings[j][0] < buildings[i][1] and buildings[j][1] > buildings[i][1]:
+                addRight = False
+        if addLeft:
+            parsed[i] = [ ['L', buildings[i][0]] ]
+        if addRight:
+            if i not in parsed:
+                parsed[i] = [ ['R', buildings[i][1]] ]
+            else:
+                parsed[i].append(['R', buildings[i][1]])
+    print(parsed)
+    return []
+
+buildingStrings = ['(' + str(building[0]) + ', ' + str(building[1]) + ')' for building in getSkyline(buildings)]
